@@ -9,18 +9,20 @@
 - 可视化分析结果
 - 支持多公司对比
 - 自动生成分析报告
+详情请参考逻辑讲解DIALOGUE_PROCESS.md和代码讲解TECHNICAL_DETAILS.md
 
 ## 安装说明
 
 1. 克隆仓库：
 ```bash
-git clone https://github.com/你的用户名/scholaragent.git
+git clone https://github.com/pagoda111king/scholaragent.git
 cd scholaragent
 ```
 
 2. 安装依赖：
 ```bash
 pip install -r requirements.txt
+还有camel 相关环境 配置过的直接增加我的环境就行没配置的我之后更新完整版本
 ```
 
 3. 配置环境变量：
