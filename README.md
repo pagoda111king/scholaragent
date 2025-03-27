@@ -90,5 +90,5 @@ scholaragent/
 
 ## 联系方式
 
-- 你的邮箱
-- 项目链接：[https://github.com/你的用户名/scholaragent](https://github.com/你的用户名/scholaragent) 
+- huiwentang5@gmail.com
+- 项目链接：[https://github.com/pagoda111king/scholaragent]
