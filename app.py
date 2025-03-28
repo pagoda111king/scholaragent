@@ -190,167 +190,112 @@ def render_analysis_progress(progress_bar, status_text, current: int, total: int
     time.sleep(0.5)  # 添加短暂延迟，避免界面卡死
 
 def main():
-    """主程序入口"""
-    try:
-        # 初始化配置
-        config = Config()
-        logger.debug("配置初始化成功")
-        
-        # 初始化分析管理器和可视化管理器
-        analysis_manager = AnalysisManager(config)
-        visualization_manager = VisualizationManager()
-        logger.debug("管理器初始化成功")
-        
-        # 设置页面标题
-        st.title("📊 年报分析报告")
-        
-        # 示例公司数据
-        companies = [
-            {
-                "name": "拓维信息",
-                "business": "软件开发和信息技术服务",
-                "rd_investment": "2.5亿元",
-                "patent_count": 150,
-                "revenue": "15.8亿元",
-                "net_profit": "1.2亿元",
-                "gross_margin": "45%",
-                "debt_ratio": "35%",
-                "market_risk": "中等",
-                "operation_risk": "低",
-                "financial_risk": "低",
-                "tech_risk": "中等"
-            },
-            {
-                "name": "振邦智能",
-                "business": "智能控制系统研发和制造",
-                "rd_investment": "1.8亿元",
-                "patent_count": 120,
-                "revenue": "12.5亿元",
-                "net_profit": "0.9亿元",
-                "gross_margin": "40%",
-                "debt_ratio": "42%",
-                "market_risk": "高",
-                "operation_risk": "中等",
-                "financial_risk": "中等",
-                "tech_risk": "低"
-            }
-        ]
+    st.title("公司分析系统")
+    
+    # 初始化配置和分析管理器
+    config = Config()
+    analysis_manager = AnalysisManager(config)
+    
+    # 示例公司数据
+    companies = [
+        {
+            "name": "拓维信息",
+            "business": "软件开发和信息技术服务",
+            "rd_investment": "2.5亿元",
+            "patent_count": 150,
+            "revenue": "15.8亿元",
+            "net_profit": "1.2亿元",
+            "gross_margin": "45%",
+            "debt_ratio": "35%",
+            "market_risk": "中等",
+            "operation_risk": "低",
+            "financial_risk": "低",
+            "tech_risk": "中等"
+        },
+        {
+            "name": "振邦智能",
+            "business": "智能控制系统研发和制造",
+            "rd_investment": "1.8亿元",
+            "patent_count": 120,
+            "revenue": "12.5亿元",
+            "net_profit": "0.9亿元",
+            "gross_margin": "40%",
+            "debt_ratio": "42%",
+            "market_risk": "高",
+            "operation_risk": "中等",
+            "financial_risk": "中等",
+            "tech_risk": "低"
+        }
+    ]
+    
+    # 分析每个公司
+    for company in companies:
+        st.subheader(f"正在分析 {company['name']}...")
         
         # 创建进度条和状态文本
         progress_bar = st.progress(0)
         status_text = st.empty()
         
-        try:
-            # 分析每个公司
-            company_analyses = []
-            total_companies = len(companies)
-            
-            for i, company in enumerate(companies):
-                # 更新进度显示
-                progress = int((i / total_companies) * 100)
-                progress_bar.progress(progress)
-                status_text.text(f"正在分析公司：{company['name']} ({i+1}/{total_companies})")
-                
-                # 创建分析步骤容器
-                with st.expander(f"分析进度 - {company['name']}", expanded=True):
-                    # 定义分析子步骤
-                    sub_steps = [
-                        "1. 基础信息分析",
-                        "2. 财务数据分析",
-                        "3. 研发创新分析",
-                        "4. 风险评估",
-                        "5. 投资建议生成"
-                    ]
-                    
-                    # 显示子步骤
-                    for step in sub_steps:
-                        st.write(f"• {step}")
-                        time.sleep(0.2)  # 添加短暂延迟，使进度显示更平滑
-                
-                logger.debug(f"开始分析公司: {company['name']}")
-                analysis = analyze_company_with_timeout(analysis_manager, company)
-                
-                if analysis:
-                    company_analyses.append({
-                        "name": company["name"],
-                        "analysis": analysis
-                    })
-                    logger.debug(f"完成公司分析: {company['name']}")
-                    st.success(f"完成 {company['name']} 的分析")
-                    
-                    # 立即显示分析结果
-                    with st.expander(f"{company['name']} 分析报告", expanded=True):
-                        # 分段显示分析结果
-                        sections = analysis.split('\n\n')
-                        for section in sections:
-                            if section.strip():
-                                # 提取标题和内容
-                                lines = section.split('\n')
-                                title = lines[0]
-                                content = '\n'.join(lines[1:])
-                                
-                                # 创建子折叠面板
-                                with st.expander(title, expanded=False):
-                                    st.markdown(content)
-            
-            # 比较公司
-            status_text.text("正在进行公司比较分析...")
-            logger.debug("开始公司比较分析")
-            
-            # 创建比较分析步骤容器
-            with st.expander("比较分析进度", expanded=True):
-                # 定义比较分析子步骤
-                comparison_steps = [
-                    "1. 财务指标对比",
-                    "2. 研发投入对比",
-                    "3. 风险水平对比",
-                    "4. 发展潜力对比",
-                    "5. 投资价值对比"
-                ]
-                
-                # 显示子步骤
-                for step in comparison_steps:
-                    st.write(f"• {step}")
-                    time.sleep(0.2)
-            
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(analysis_manager.compare_companies, companies)
-                try:
-                    comparison_result = future.result(timeout=600)  # 增加超时时间到600秒
-                except TimeoutError:
-                    logger.error("公司比较分析超时")
-                    comparison_result = "公司比较分析超时，请重试"
-                except Exception as e:
-                    logger.error(f"公司比较分析时发生错误: {str(e)}")
-                    comparison_result = f"公司比较分析时发生错误: {str(e)}"
-            
-            # 显示比较分析结果
-            if comparison_result:
-                with st.expander("公司比较分析报告", expanded=True):
-                    # 分段显示比较结果
-                    sections = comparison_result.split('\n\n')
-                    for section in sections:
-                        if section.strip():
-                            # 提取标题和内容
-                            lines = section.split('\n')
-                            title = lines[0]
-                            content = '\n'.join(lines[1:])
-                            
-                            # 创建子折叠面板
-                            with st.expander(title, expanded=False):
-                                st.markdown(content)
-            
-            progress_bar.progress(100)
-            status_text.text("分析完成！")
-            logger.debug("完成所有分析")
-            
-        except Exception as e:
-            logger.error(f"分析过程中出错: {str(e)}")
-            st.error(f"分析过程中出错: {str(e)}")
-            
+        # 第一阶段：基础信息分析
+        status_text.text("学术研究员正在分析基础信息...")
+        with st.expander("📋 基础信息分析", expanded=True):
+            st.write("**学术研究员分析：**")
+            analysis = analysis_manager.analyze_company(company)
+            st.write(analysis.split("财务分析")[0])
+        progress_bar.progress(20)
+        time.sleep(0.5)
+        
+        # 第二阶段：财务分析
+        status_text.text("财务分析师正在进行财务分析...")
+        with st.expander("💰 财务分析", expanded=True):
+            st.write("**财务分析师分析：**")
+            financial_part = analysis.split("财务分析")[1].split("研发创新分析")[0]
+            st.write(financial_part)
+        progress_bar.progress(40)
+        time.sleep(0.5)
+        
+        # 第三阶段：研发创新分析
+        status_text.text("技术专家正在分析研发创新能力...")
+        with st.expander("🔬 研发创新分析", expanded=True):
+            st.write("**技术专家分析：**")
+            rd_part = analysis.split("研发创新分析")[1].split("风险评估")[0]
+            st.write(rd_part)
+        progress_bar.progress(60)
+        time.sleep(0.5)
+        
+        # 第四阶段：风险评估
+        status_text.text("风险经理正在进行风险评估...")
+        with st.expander("⚠️ 风险评估", expanded=True):
+            st.write("**风险经理分析：**")
+            risk_part = analysis.split("风险评估")[1].split("行业对比")[0]
+            st.write(risk_part)
+        progress_bar.progress(80)
+        time.sleep(0.5)
+        
+        # 第五阶段：投资建议
+        status_text.text("投资顾问正在生成投资建议...")
+        with st.expander("💡 投资建议", expanded=True):
+            st.write("**投资顾问分析：**")
+            investment_part = analysis.split("投资建议")[1]
+            st.write(investment_part)
+        progress_bar.progress(100)
+        
+        st.markdown("---")
+    
+    # 比较公司
+    st.subheader("公司比较分析")
+    status_text = st.empty()
+    status_text.text("分析师正在进行公司比较分析...")
+    
+    try:
+        comparison = analysis_manager.compare_companies(companies)
+        if comparison:
+            st.write(comparison)
+        else:
+            st.error("公司比较分析失败，请重试")
     except Exception as e:
-        logger.error(f"程序运行出错: {str(e)}")
-        st.error(f"程序运行出错: {str(e)}")
+        logger.error(f"公司比较分析失败: {str(e)}")
+        st.error(f"公司比较分析失败: {str(e)}")
 
 if __name__ == "__main__":
     main()
