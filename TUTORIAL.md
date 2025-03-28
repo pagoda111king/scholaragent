@@ -4,39 +4,92 @@
 
 ScholarAgent 是一个基于 CAMEL 框架开发的智能年报分析系统,通过多智能体协作实现对公司年报的深度分析。本教程将详细介绍系统的实现原理和使用方法。
 
-## 2. 核心功能实现
+## 2. 章节打卡指南
 
-### 2.1 多智能体协作系统
+### Chapter 1: 多智能体协作系统实现
 
-#### 2.1.1 智能体角色设计
+#### 1.1 学习要点
+- 理解多智能体系统的设计原理
+- 掌握角色扮演系统的实现方法
+- 学习智能体间的协作机制
+- 了解系统提示词的设计原则
 
-系统设计了三个专业的智能体角色:
+#### 1.2 CAMEL 知识点应用
+1. **多智能体系统设计** (参考 Chapter 1.1-1.3)
+   - 使用 `camel.agents` 包中的 `ChatAgent` 类实现智能体
+   - 应用 `camel.societies` 包中的 `RolePlaying` 类实现角色扮演
+   - 参考 Chapter 1.4 中的智能体协作机制
 
+2. **角色设计** (参考 Chapter 1.5-1.7)
+   - 使用 `camel.types.RoleType` 定义角色类型
+   - 应用 `camel.messages.BaseMessage` 实现消息传递
+   - 利用 `camel.memories.AgentMemory` 管理对话历史
+
+3. **系统提示词** (参考 Chapter 1.8-1.9)
+   - 使用 `camel.prompts.PromptTemplate` 设计系统提示词
+   - 应用 `camel.prompts.PromptTemplateGenerator` 生成提示词模板
+
+#### 1.3 代码实现
 ```python
 # scholar.py 中的实现
+from camel.agents import ChatAgent
+from camel.messages import BaseMessage
+from camel.types import RoleType
+from camel.societies import RolePlaying
+from camel.memories import AgentMemory
+from camel.prompts import PromptTemplate
+
 class FinancialAnalysisSociety:
     def __init__(self):
-        # 初始化角色
-        self.roles = {
-            "academic_researcher": {
-                "name": "Academic Researcher",
-                "role": "Financial academic researcher specializing in analyzing company annual reports using academic methodologies",
-                "goal": "Analyze company annual reports using academic research methodologies and provide insights"
-            },
-            "financial_analyst": {
-                "name": "Financial Analyst", 
-                "role": "Professional financial analyst specializing in company valuation and risk assessment",
-                "goal": "Evaluate company performance and provide investment recommendations"
-            },
-            "risk_manager": {
-                "name": "Risk Manager",
-                "role": "Risk management expert focusing on financial risk assessment and mitigation",
-                "goal": "Identify and analyze potential risks in company operations"
-            }
-        }
+        # 初始化记忆系统
+        self.memory = AgentMemory()
+        
+        # 初始化角色扮演系统
+        self.society = RolePlaying(
+            model=self.model,
+            roles=self.roles,
+            memory=self.memory
+        )
+        
+        # 初始化系统提示词
+        self.system_prompt = PromptTemplate(
+            template="""你是一个专业的金融分析团队，由以下角色组成：
+            1. 学术研究员：负责检索和分析相关学术论文
+            2. 财务分析师：负责评估公司财务表现
+            3. 风险管理师：负责评估公司风险状况"""
+        )
 ```
 
-实际运行结果示例:
+#### 1.4 实际应用
+```python
+# main.py 中的使用示例
+def main():
+    print("开始分析拓维信息和振邦智能的年报摘要...")
+    
+    society = FinancialAnalysisSociety()
+    
+    # 拓维信息数据
+    talkweb_data = {
+        "company_name": "拓维信息",
+        "year": 2023,
+        "risk_metrics": {
+            "capital_adequacy_ratio": 0.482,
+            "profit_margin": 0.014,
+            "growth_rate": 0.4102
+        },
+        "financial_statements": {
+            "total_assets": 5287129846.78,
+            "net_profit": 44963139.28,
+            "revenue": 3154141699.10,
+            "operating_cash_flow": -1169883405.68
+        }
+    }
+    
+    # 运行分析
+    analysis = society.analyze_company(talkweb_data)
+```
+
+#### 1.5 运行结果
 ```
 正在分析 拓维信息...
 投资顾问正在生成投资建议...
@@ -58,40 +111,56 @@ class FinancialAnalysisSociety:
 资产负债率：35%
 ```
 
-### 2.2 财务分析模块
+### Chapter 2: 财务分析模块实现
 
-#### 2.2.1 财务指标分析
+#### 2.1 学习要点
+- 掌握财务指标的计算方法
+- 理解财务分析的关键维度
+- 学习财务数据的处理技巧
+- 了解财务分析报告的生成逻辑
 
+#### 2.2 CAMEL 知识点应用
+1. **数据处理** (参考 Chapter 2.1-2.3)
+   - 使用 `camel.toolkits` 包中的数据处理工具
+   - 应用 `camel.retrievers` 包中的检索器进行数据检索
+   - 利用 `camel.embeddings` 包进行数据向量化
+
+2. **分析报告生成** (参考 Chapter 2.4-2.6)
+   - 使用 `camel.prompts` 包生成分析报告模板
+   - 应用 `camel.visualization` 包进行数据可视化
+   - 利用 `camel.memories` 包管理分析历史
+
+#### 2.3 代码实现
 ```python
 # analysis.py 中的实现
-def analyze_financial_metrics(self, company_data: Dict[str, Any]) -> str:
-    """分析财务指标"""
-    try:
-        # 计算关键财务指标
-        revenue = float(company_data['revenue'].replace('亿元', ''))
-        net_profit = float(company_data['net_profit'].replace('亿元', ''))
-        gross_margin = float(company_data['gross_margin'].replace('%', ''))
-        debt_ratio = float(company_data['debt_ratio'].replace('%', ''))
+from camel.toolkits import SearchToolkit
+from camel.retrievers import BM25Retriever
+from camel.embeddings import OpenAIEmbedding
+from camel.prompts import PromptTemplate
+from camel.visualization import VisualizationManager
+
+class AnalysisManager:
+    def __init__(self, config: Config):
+        # 初始化检索器
+        self.retriever = BM25Retriever()
         
-        # 生成分析报告
-        analysis = f"""
-        财务指标分析:
-        1. 盈利能力
-           - 营业收入: {revenue}亿元
-           - 净利润: {net_profit}亿元
-           - 净利润率: {(net_profit/revenue)*100:.2f}%
+        # 初始化向量化工具
+        self.embedding = OpenAIEmbedding()
         
-        2. 运营效率
-           - 毛利率: {gross_margin}%
-           - 资产负债率: {debt_ratio}%
-        """
-        return analysis
-    except Exception as e:
-        logger.error(f"财务分析失败: {str(e)}")
-        return ""
+        # 初始化可视化管理器
+        self.visualization = VisualizationManager()
 ```
 
-实际运行结果示例:
+#### 2.4 实际应用
+```python
+# 在 main.py 中使用财务分析模块
+def analyze_company_financials(company_data):
+    analysis_manager = AnalysisManager(config)
+    financial_analysis = analysis_manager.analyze_financial_metrics(company_data)
+    return financial_analysis
+```
+
+#### 2.5 运行结果
 ```
 💰 财务分析
 
@@ -104,44 +173,59 @@ def analyze_financial_metrics(self, company_data: Dict[str, Any]) -> str:
 这个比率反映了每1元销售收入中，公司能赚取的净利润。7.59%的净利润率在不同行业中可能有不同的评价标准。
 ```
 
-### 2.3 研发创新分析
+### Chapter 3: 研发创新分析模块实现
 
-#### 2.3.1 研发投入分析
+#### 3.1 学习要点
+- 理解研发投入的分析方法
+- 掌握专利密度的计算方式
+- 学习创新效率的评估标准
+- 了解技术风险的分析维度
 
+#### 3.2 CAMEL 知识点应用
+1. **向量数据库应用** (参考 Chapter 4.1-4.3)
+   - 使用 `camel.storages.vectordb_storages` 包进行向量存储
+   - 应用 Milvus 数据库存储专利向量
+   - 利用向量相似度搜索进行专利分析
+
+2. **检索系统** (参考 Chapter 4.4-4.6)
+   - 使用 `camel.retrievers` 包实现专利检索
+   - 应用 `camel.embeddings` 包进行专利文本向量化
+   - 利用 `camel.memories` 包管理检索历史
+
+3. **数据存储优化** (参考 Chapter 4.7)
+   - 使用向量数据库的索引优化
+   - 应用数据压缩和缓存策略
+   - 实现高效的数据检索机制
+
+#### 3.3 代码实现
 ```python
 # analysis.py 中的实现
-def analyze_rd_investment(self, company_data: Dict[str, Any]) -> str:
-    """分析研发投入"""
-    try:
-        # 计算研发投入占比
-        revenue = float(company_data['revenue'].replace('亿元', ''))
-        rd_investment = float(company_data['rd_investment'].replace('亿元', ''))
-        rd_ratio = (rd_investment / revenue) * 100
+from camel.storages.vectordb_storages import MilvusStorage
+from camel.retrievers import RAGRetriever
+from camel.embeddings import OpenAIEmbedding
+
+class RDInnovationAnalyzer:
+    def __init__(self):
+        # 初始化向量存储
+        self.vector_storage = MilvusStorage()
         
-        # 计算专利密度
-        patent_count = company_data['patent_count']
-        patent_density = patent_count / revenue
-        
-        # 生成分析报告
-        analysis = f"""
-        研发创新分析:
-        1. 研发投入
-           - 研发投入金额: {rd_investment}亿元
-           - 研发投入占比: {rd_ratio:.2f}%
-           - 研发投入强度: {self._evaluate_rd_intensity(rd_ratio)}
-        
-        2. 创新能力
-           - 专利数量: {patent_count}项
-           - 专利密度: {patent_density:.2f}项/亿元
-           - 创新效率: {self._evaluate_innovation_efficiency(patent_density)}
-        """
-        return analysis
-    except Exception as e:
-        logger.error(f"研发分析失败: {str(e)}")
-        return ""
+        # 初始化检索器
+        self.retriever = RAGRetriever(
+            embedding_model=OpenAIEmbedding(),
+            retrieval_model=BM25Retriever()
+        )
 ```
 
-实际运行结果示例:
+#### 3.4 实际应用
+```python
+# 在 main.py 中使用研发分析模块
+def analyze_company_rd(company_data):
+    analysis_manager = AnalysisManager(config)
+    rd_analysis = analysis_manager.analyze_rd_investment(company_data)
+    return rd_analysis
+```
+
+#### 3.5 运行结果
 ```
 🔬 研发创新分析
 
@@ -159,54 +243,61 @@ def analyze_rd_investment(self, company_data: Dict[str, Any]) -> str:
 - 风险应对建议：建议保持技术研发投入，关注行业技术发展趋势
 ```
 
-### 2.4 风险评估模块
+### Chapter 4: 风险评估模块实现
 
-#### 2.4.1 风险分析
+#### 4.1 学习要点
+- 掌握风险评分的计算方法
+- 理解多维度风险评估体系
+- 学习风险等级的划分标准
+- 了解风险建议的生成逻辑
 
+#### 4.2 CAMEL 知识点应用
+1. **风险评估系统** (参考 Chapter 5.1-5.3)
+   - 使用 `camel.agents` 包实现风险评估智能体
+   - 应用 `camel.memories` 包管理风险评估历史
+   - 利用 `camel.prompts` 包生成风险评估报告
+
+2. **数据可视化** (参考 Chapter 5.4-5.6)
+   - 使用 `camel.visualization` 包进行风险可视化
+   - 应用 `camel.toolkits` 包进行数据处理
+   - 利用 `camel.retrievers` 包检索历史风险数据
+
+3. **风险预警机制** (参考 Chapter 5.7)
+   - 实现实时风险监控
+   - 应用风险预警规则
+   - 生成风险预警报告
+
+#### 4.3 代码实现
 ```python
 # analysis.py 中的实现
-def analyze_risks(self, company_data: Dict[str, Any]) -> str:
-    """分析公司风险"""
-    try:
-        # 获取各类风险等级
-        market_risk = company_data['market_risk']
-        operation_risk = company_data['operation_risk']
-        financial_risk = company_data['financial_risk']
-        tech_risk = company_data['tech_risk']
+from camel.agents import ChatAgent
+from camel.memories import AgentMemory
+from camel.prompts import PromptTemplate
+from camel.visualization import VisualizationManager
+
+class RiskAnalyzer:
+    def __init__(self):
+        # 初始化风险评估智能体
+        self.risk_agent = ChatAgent(
+            role_name="Risk Manager",
+            role_type=RoleType.ASSISTANT,
+            memory=AgentMemory()
+        )
         
-        # 计算综合风险得分
-        risk_scores = {
-            '高': 3,
-            '中等': 2,
-            '低': 1
-        }
-        total_risk = (
-            risk_scores.get(market_risk, 2) +
-            risk_scores.get(operation_risk, 2) +
-            risk_scores.get(financial_risk, 2) +
-            risk_scores.get(tech_risk, 2)
-        ) / 4
-        
-        # 生成分析报告
-        analysis = f"""
-        风险评估:
-        1. 风险分布
-           - 市场风险: {market_risk}
-           - 经营风险: {operation_risk}
-           - 财务风险: {financial_risk}
-           - 技术风险: {tech_risk}
-        
-        2. 综合评估
-           - 综合风险得分: {total_risk:.2f}
-           - 风险等级: {self._get_risk_level(total_risk)}
-        """
-        return analysis
-    except Exception as e:
-        logger.error(f"风险分析失败: {str(e)}")
-        return ""
+        # 初始化可视化管理器
+        self.visualization = VisualizationManager()
 ```
 
-实际运行结果示例:
+#### 4.4 实际应用
+```python
+# 在 main.py 中使用风险评估模块
+def analyze_company_risks(company_data):
+    analysis_manager = AnalysisManager(config)
+    risk_analysis = analysis_manager.analyze_risks(company_data)
+    return risk_analysis
+```
+
+#### 4.5 运行结果
 ```
 ⚠️ 风险评估
 
@@ -217,52 +308,69 @@ def analyze_risks(self, company_data: Dict[str, Any]) -> str:
 竞争态势：拓维信息主要业务集中在信息技术服务领域，尤其是软件开发和系统集成服务。这一行业内的竞争非常激烈，不仅有众多国内外同行的竞争压力，还有来自互联网巨头在某些细分市场的挑战。
 ```
 
-### 2.5 投资建议生成
+### Chapter 5: 投资建议生成模块实现
 
-#### 2.5.1 投资价值评估
+#### 5.1 学习要点
+- 掌握投资价值评估方法
+- 理解风险收益平衡原则
+- 学习投资建议的生成逻辑
+- 了解多维度评分体系
 
+#### 5.2 CAMEL 知识点应用
+1. **投资分析系统** (参考 Chapter 6.1-6.3)
+   - 使用 `camel.agents` 包实现投资分析智能体
+   - 应用 `camel.memories` 包管理投资分析历史
+   - 利用 `camel.prompts` 包生成投资建议报告
+
+2. **数据集成** (参考 Chapter 6.4-6.6)
+   - 使用 `camel.toolkits` 包集成外部数据
+   - 应用 `camel.retrievers` 包检索市场数据
+   - 利用 `camel.embeddings` 包进行数据向量化
+
+3. **投资策略优化** (参考 Chapter 6.7)
+   - 实现投资组合优化
+   - 应用风险评估模型
+   - 生成投资策略建议
+
+#### 5.3 代码实现
 ```python
 # visualization.py 中的实现
-def _calculate_investment_metrics(self, company_data: Dict[str, Any]) -> Dict[str, float]:
-    """计算投资相关指标"""
-    try:
-        # 计算风险得分
-        risk_scores = {
-            '高': 3,
-            '中等': 2,
-            '低': 1
-        }
-        risk_score = (
-            risk_scores.get(company_data['market_risk'], 2) +
-            risk_scores.get(company_data['operation_risk'], 2) +
-            risk_scores.get(company_data['financial_risk'], 2) +
-            risk_scores.get(company_data['tech_risk'], 2)
-        ) / 4
+from camel.agents import ChatAgent
+from camel.memories import AgentMemory
+from camel.prompts import PromptTemplate
+from camel.toolkits import SearchToolkit
+from camel.retrievers import BM25Retriever
+
+class InvestmentAdvisor:
+    def __init__(self):
+        # 初始化投资分析智能体
+        self.investment_agent = ChatAgent(
+            role_name="Investment Advisor",
+            role_type=RoleType.ASSISTANT,
+            memory=AgentMemory()
+        )
         
-        # 计算投资价值得分
-        revenue = float(company_data['revenue'].replace('亿元', ''))
-        net_profit = float(company_data['net_profit'].replace('亿元', ''))
-        rd_investment = float(company_data['rd_investment'].replace('亿元', ''))
-        patent_count = float(company_data['patent_count'])
+        # 初始化搜索工具
+        self.search_toolkit = SearchToolkit()
         
-        # 计算各项指标
-        profit_ratio = (net_profit / revenue) * 40  # 盈利能力权重40%
-        rd_ratio = (rd_investment / revenue) * 30    # 研发投入权重30%
-        patent_ratio = (patent_count / revenue) * 30 # 创新能力权重30%
-        
-        # 计算总分
-        score = profit_ratio + rd_ratio + patent_ratio
-        
-        return {
-            'score': min(score, 10),  # 限制最高分为10
-            'risk_score': risk_score
-        }
-    except Exception as e:
-        logger.error(f"计算投资指标时出错: {str(e)}")
-        return {'score': 0, 'risk_score': 2}
+        # 初始化检索器
+        self.retriever = BM25Retriever()
 ```
 
-实际运行结果示例:
+#### 5.4 实际应用
+```python
+# 在 main.py 中使用投资建议模块
+def generate_investment_advice(company_data):
+    analysis_manager = AnalysisManager(config)
+    investment_metrics = analysis_manager._calculate_investment_metrics(company_data)
+    advice = analysis_manager._generate_specific_advice(
+        investment_metrics['score'],
+        investment_metrics['risk_score']
+    )
+    return advice
+```
+
+#### 5.5 运行结果
 ```
 💡 投资建议
 
