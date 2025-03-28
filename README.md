@@ -76,40 +76,41 @@ ScholarAgent 是一个基于 CAMEL 框架开发的智能年报分析系统,通�
 
 #### 1.1.1 整体架构
 ```mermaid
-graph TB
+flowchart TB
     subgraph 输入层
         A[公司年报数据] --> B[数据预处理]
         C[学术论文数据] --> B
-        B --> |preprocess_data()| D[数据清洗]
-        D --> |standardize_data()| E[数据标准化]
+        B --> D[数据清洗]
+        D --> E[数据标准化]
     end
     
     subgraph 多智能体层
-        E --> |initialize_agents()| F[学术研究员]
-        E --> |initialize_agents()| G[财务分析师]
-        E --> |initialize_agents()| H[风险管理师]
-        F --> |analyze_academic()| I[分析结果]
-        G --> |analyze_financial()| I
-        H --> |analyze_risk()| I
+        E --> F[学术研究员]
+        E --> G[财务分析师]
+        E --> H[风险管理师]
+        F --> I[分析结果]
+        G --> I
+        H --> I
     end
     
     subgraph 分析层
-        I --> |process_financial()| J[财务分析]
-        I --> |process_rd()| K[研发创新分析]
-        I --> |process_risk()| L[风险评估]
+        I --> J[财务分析]
+        I --> K[研发创新分析]
+        I --> L[风险评估]
     end
     
     subgraph 输出层
-        J --> |generate_report()| M[投资建议]
-        K --> |generate_report()| M
-        L --> |generate_report()| M
-        M --> |visualize_results()| N[可视化展示]
+        J --> M[投资建议]
+        K --> M
+        L --> M
+        M --> N[可视化展示]
     end
 
     style 输入层 fill:#f9f,stroke:#333,stroke-width:2px
     style 多智能体层 fill:#bbf,stroke:#333,stroke-width:2px
     style 分析层 fill:#bfb,stroke:#333,stroke-width:2px
     style 输出层 fill:#fbb,stroke:#333,stroke-width:2px
+
 ```
 
 #### 1.1.2 多智能体协作流程
@@ -143,93 +144,96 @@ sequenceDiagram
 
 #### 1.1.3 数据处理流程
 ```mermaid
-graph LR
+flowchart LR
     subgraph 数据输入
-        A[原始数据] --> |preprocess_data()| B[数据清洗]
-        B --> |standardize_data()| C[数据标准化]
+        A[原始数据] --> B[数据清洗]
+        B --> C[数据标准化]
     end
     
     subgraph 向量化处理
-        C --> |text_to_vector()| D[文本向量化]
-        C --> |numeric_to_vector()| E[数值向量化]
-        D --> |store_vectors()| F[向量存储]
-        E --> |store_vectors()| F
+        C --> D[文本向量化]
+        C --> E[数值向量化]
+        D --> F[向量存储]
+        E --> F
     end
     
     subgraph 分析处理
-        F --> |calculate_similarity()| G[相似度计算]
-        G --> |extract_features()| H[特征提取]
-        H --> |generate_results()| I[结果生成]
+        F --> G[相似度计算]
+        G --> H[特征提取]
+        H --> I[结果生成]
     end
 
     style 数据输入 fill:#f9f,stroke:#333,stroke-width:2px
     style 向量化处理 fill:#bbf,stroke:#333,stroke-width:2px
     style 分析处理 fill:#bfb,stroke:#333,stroke-width:2px
+
 ```
 
 #### 1.1.4 模块实现细节
 ```mermaid
-graph TB
+flowchart TB
     subgraph 分析管理器
-        A[AnalysisManager] --> |__init__()| B[初始化配置]
-        A --> |load_data()| C[数据加载]
-        A --> |generate_report()| D[结果生成]
+        A[AnalysisManager] --> |init| B[初始化配置]
+        A --> |load_data| C[数据加载]
+        A --> |generate_report| D[结果生成]
     end
     
     subgraph 工具包
-        B --> |initialize()| E[SearchToolkit]
-        B --> |initialize()| F[BM25Retriever]
-        B --> |initialize()| G[OpenAIEmbedding]
+        B --> |initialize| E[SearchToolkit]
+        B --> |initialize| F[BM25Retriever]
+        B --> |initialize| G[OpenAIEmbedding]
     end
     
     subgraph 智能体
-        C --> |create_agent()| H[ChatAgent]
-        C --> |create_society()| I[RolePlaying]
-        C --> |create_memory()| J[AgentMemory]
+        C --> |create_agent| H[ChatAgent]
+        C --> |create_society| I[RolePlaying]
+        C --> |create_memory| J[AgentMemory]
     end
     
     subgraph 存储
-        D --> |store()| K[MilvusStorage]
-        D --> |query()| L[VectorDBQuery]
-        D --> |process()| M[VectorDBQueryResult]
+        D --> |store| K[MilvusStorage]
+        D --> |query| L[VectorDBQuery]
+        D --> |process| M[VectorDBQueryResult]
     end
 
     style 分析管理器 fill:#f9f,stroke:#333,stroke-width:2px
     style 工具包 fill:#bbf,stroke:#333,stroke-width:2px
     style 智能体 fill:#bfb,stroke:#333,stroke-width:2px
     style 存储 fill:#fbb,stroke:#333,stroke-width:2px
+
 ```
 
 #### 1.1.5 函数调用关系
 ```mermaid
 graph TB
-    subgraph main.py
-        A[main()] --> B[Config()]
-        A --> C[AnalysisManager()]
-        A --> D[analyze_company()]
-        A --> E[compare_companies()]
+    subgraph main
+        A[main] --> B[Config]
+        A --> C[AnalysisManager]
+        A --> D[analyze_company]
+        A --> E[compare_companies]
     end
     
-    subgraph analysis.py
-        C --> F[__init__()]
-        C --> G[analyze_financial_metrics()]
-        C --> H[analyze_rd_investment()]
-        C --> I[analyze_risks()]
-        C --> J[_calculate_investment_metrics()]
-        C --> K[_generate_specific_advice()]
+    subgraph analysis
+        C --> F[__init__]
+        C --> G[analyze_financial_metrics]
+        C --> H[analyze_rd_investment]
+        C --> I[analyze_risks]
+        C --> J[_calculate_investment_metrics]
+        C --> K[_generate_specific_advice]
     end
     
-    subgraph roles.py
-        L[FinancialAnalysisSociety] --> M[__init__()]
-        L --> N[analyze_company()]
-        M --> O[AgentMemory()]
-        M --> P[RolePlaying()]
-        M --> Q[PromptTemplate()]
+    subgraph roles
+        L[FinancialAnalysisSociety] --> M[__init__]
+        L --> N[analyze_company]
+        M --> O[AgentMemory]
+        M --> P[RolePlaying]
+        M --> Q[PromptTemplate]
     end
 
-    style main.py fill:#f9f,stroke:#333,stroke-width:2px
-    style analysis.py fill:#bbf,stroke:#333,stroke-width:2px
-    style roles.py fill:#bfb,stroke:#333,stroke-width:2px
+    style main fill:#f9f,stroke:#333,stroke-width:2px
+    style analysis fill:#bbf,stroke:#333,stroke-width:2px
+    style roles fill:#bfb,stroke:#333,stroke-width:2px
+
 ```
 
 ### 2. 基于研报摘要分析多智能体系统的task章节打卡
